@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    {% include 'menu.html' with selected=menu_page %}
+    {% if title %}
+        <h2>{{ title }}:</h2>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <table class="tab{{ width }}">
+            <tr>
+                <th colspan="2"><h2>{{ header }}</h2></th>
+            </tr>
+            {% for key,value in values.items %}
+                {% if value.options %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>
+                            <select name='{{ value.variable }}' class="large_choice">
+                                <option value=''>---== choose ==---</option>
+                                {% for option in value.options %}
+                                    <option value='{{ option.id }}' {% if option.id == value.data %} selected {% endif %}>{{ option.desc }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% elif value.checkbox is not None %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td style="text-align:center"><input type="checkbox" name="{{ value.variable }}" {% if value.checkbox == True %}checked{% endif %}></td>
+                    </tr>
+                {% elif value.type == 'date' %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td><input type="date" name="{{ value.variable }}" value="{{ value.data|date:"Y-m-d"}}" class="input_date"></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td><input type="text" name="{{ value.variable }}" value="{{ value.data }}" class="large_input"></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="SAVE" class="large_button">
+                </td>
+            </tr>
+        </table>
+    </form>
+    {% if message != '' %}
+        <table class="tab{{ width }}">
+            <tr>
+                <td colspan="2">
+                    {{ message }}
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+    {% for button in buttons %}
+        <table class="tab{{ width }}">
+            <tr>
+                <td colspan="2">
+                    <form method="GET" action="{{ button.link }}">
+                        <input type="submit" value="{{ button.name }}" class="large_button">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    {% endfor %}
+{% endblock %}

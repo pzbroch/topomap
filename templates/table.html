@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% load custom_tags %}
+{% load static %}
+
+
+{% block content %}
+    {% include 'menu.html' with selected=menu_page %}
+    {% if title %}
+        <h2>{{ title }}:</h2>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <table class="tab{{ width }}">
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% if sorts %}
+                <tr>
+                    {% for sort in sorts %}
+                        {% if sort != '' %}
+                            <td style="text-align:center">
+                                <input type="submit" name="{{ sort }}" value="^" style="background-color:#e2e2e2"/>
+                                <input type="submit" name="{{ sort }}" value="=" style="background-color:#e2e2e2" />
+                                <input type="submit" name="{{ sort }}" value="v" style="background-color:#e2e2e2" />
+                            </td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+            {% if filters %}
+                <tr>
+                    {% for filter in filters %}
+                        {% if filter.type is not None %}
+                            {% if filter.type == 'text' %}
+                                <td style="text-align:center" colspan="{{ filter.colspan }}">
+                                    <input type="text" name="{{ filter.variable }}" placeholder="{{ filter.label }}" value="{{ filter.value }}" class="large_input">
+                                </td>
+                            {% elif filter.type == '2texts' %}
+                                <td style="text-align:center" colspan="{{ filter.colspan }}">
+                                    <input type="text" name="{{ filter.variable.0 }}" placeholder="{{ filter.label.0 }}" value="{{ filter.value.0 }}" class="small_input">
+                                    <input type="text" name="{{ filter.variable.1 }}" placeholder="{{ filter.label.1 }}" value="{{ filter.value.1 }}" class="small_input">
+                                </td>
+                            {% elif filter.type == 'date' %}
+                                <td style="text-align:center" colspan="{{ filter.colspan }}">
+                                    <font size="1px">from:</font><input type="date" name="{{ filter.variable.0 }}" placeholder="{{ filter.label.0 }}" value="{{ filter.value.0 }}" class="input_date_small">
+                                    <font size="1px">to:</font><input type="date" name="{{ filter.variable.1 }}" placeholder="{{ filter.label.1 }}" value="{{ filter.value.1 }}" class="input_date_small">
+                                    <input type="submit" value=">" class="smallbutton">
+                                </td>
+                            {% endif %}
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit" hidden>
+                </tr>
+            {% endif %}
+            {% for value in values %}
+                <tr>
+                    {% for item,align in value|zip:aligns %}
+                        {% if forloop.counter == 1 %}
+                            {% if icons %}
+                                <td style="text-align:{{ align }}">
+                                    {% for icon in icons %}
+                                        <a href="{{ icon.link }}/{{ item }}"><img alt="{{ icon.icon }}" title="{{ icon.icon }}" src="{% static icon.icon|add:".png" %}"></a>
+                                    {% endfor %}
+                                </td>
+                            {% else %}
+                                <td style="text-align:{{ align }};white-space:pre-line;">{{ item }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td style="text-align:{{ align }};white-space:pre-line;">{{ item }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+    {% if buttons %}
+        {% for button in buttons %}
+            <table class="tab{{ width }}">
+                <tr>
+                    <td colspan="{{ headers.length }}">
+                        <form method="GET" action="{{ button.link }}">
+                            <input type="submit" value="{{ button.name }}" class="large_button">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

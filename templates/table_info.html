@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    {% include 'menu.html' with selected=menu_page %}
+    {% if title %}
+        <h2>{{ title }}:</h2>
+    {% endif %}
+    <table class="tab{{ width }}">
+        <tr>
+            <th colspan="2"><h2>{{ header }}</h2></th>
+        </tr>
+        {% for key,value in values.items %}
+            <tr>
+                <td>{{ key }}</td>
+                <td style="white-space:pre-line;">{{ value }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% if message != '' %}
+        <table class="tab{{ width }}">
+            <tr>
+                <td colspan="2">
+                    {{ message }}
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+    {% if buttons %}
+        {% for button in buttons %}
+            <table class="tab{{ width }}">
+                <tr>
+                    <td colspan="2">
+                        <form method="GET" action="{{ button.link }}">
+                            <input type="submit" value="{{ button.name }}" class="large_button">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

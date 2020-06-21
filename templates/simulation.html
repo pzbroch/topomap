@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% load custom_tags %}
+{% load static %}
+
+
+{% block content %}
+    {% include 'menu.html' with selected=menu_page %}
+    {% if title %}
+        <h2>{{ title }}:</h2>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <table class="tab{{ width }}">
+            <tr>
+                {% for dev_header in dev_headers %}
+                    <th>{{ dev_header }}</th>
+                {% endfor %}
+            </tr>
+            {% if dev_sorts %}
+                <tr>
+                    {% for dev_sort in dev_sorts %}
+                        {% if dev_sort != '' %}
+                            <td style="text-align:center">
+                                <input type="submit" name="{{ dev_sort }}" value="^" style="background-color:#e2e2e2"/>
+                                <input type="submit" name="{{ dev_sort }}" value="=" style="background-color:#e2e2e2" />
+                                <input type="submit" name="{{ dev_sort }}" value="v" style="background-color:#e2e2e2" />
+                            </td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+            {% if dev_filters %}
+                <tr>
+                    {% for dev_filter in dev_filters %}
+                        {% if dev_filter.type is not None %}
+                            {% if dev_filter.type == 'text' %}
+                                <td style="text-align:center" colspan="{{ dev_filter.colspan }}">
+                                    <input type="text" name="{{ dev_filter.variable }}" placeholder="{{ dev_filter.label }}" value="{{ dev_filter.value }}" class="large_input">
+                                </td>
+                            {% elif dev_filter.type == '2texts' %}
+                                <td style="text-align:center" colspan="{{ dev_filter.colspan }}">
+                                    <input type="text" name="{{ dev_filter.variable.0 }}" placeholder="{{ dev_filter.label.0 }}" value="{{ dev_filter.value.0 }}" class="small_input">
+                                    <input type="text" name="{{ dev_filter.variable.1 }}" placeholder="{{ dev_filter.label.1 }}" value="{{ dev_filter.value.1 }}" class="small_input">
+                                </td>
+                            {% endif %}
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit" hidden>
+                </tr>
+            {% endif %}
+            {% for dev_value in dev_values %}
+                <tr>
+                    {% for dev_item,dev_align in dev_value|zip:dev_aligns %}
+                        {% if forloop.counter == 1 %}
+                            <td style="text-align:{{ dev_align }}">
+                                <a href="/simulation/dev-toggle/{{ dev_item }}"><img alt="toggle" title="toggle" src="{% static 'toggle.png' %}"></a>
+                            </td>
+                        {% else %}
+                            <td style="text-align:{{ dev_align }};white-space:pre-line;{% if dev_item == 'OK' %}background-color:#adebad;{% elif dev_item == 'NO UPLINK' %}background-color:#ffcccc;{% elif dev_item == 'FAILURE' %}background-color:#ff9999;{% endif %}">{{ dev_item }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <table class="tab{{ width }}">
+            <tr>
+                {% for link_header in link_headers %}
+                    <th>{{ link_header }}</th>
+                {% endfor %}
+            </tr>
+            {% if link_sorts %}
+                <tr>
+                    {% for link_sort in link_sorts %}
+                        {% if link_sort != '' %}
+                            <td style="text-align:center">
+                                <input type="submit" name="{{ link_sort }}" value="^" style="background-color:#e2e2e2"/>
+                                <input type="submit" name="{{ link_sort }}" value="=" style="background-color:#e2e2e2" />
+                                <input type="submit" name="{{ link_sort }}" value="v" style="background-color:#e2e2e2" />
+                            </td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+            {% if link_filters %}
+                <tr>
+                    {% for link_filter in link_filters %}
+                        {% if link_filter.type is not None %}
+                            {% if link_filter.type == 'text' %}
+                                <td style="text-align:center" colspan="{{ link_filter.colspan }}">
+                                    <input type="text" name="{{ link_filter.variable }}" placeholder="{{ link_filter.label }}" value="{{ link_filter.value }}" class="large_input">
+                                </td>
+                            {% elif link_filter.type == '2texts' %}
+                                <td style="text-align:center" colspan="{{ link_filter.colspan }}">
+                                    <input type="text" name="{{ link_filter.variable.0 }}" placeholder="{{ link_filter.label.0 }}" value="{{ link_filter.value.0 }}" class="small_input">
+                                    <input type="text" name="{{ link_filter.variable.1 }}" placeholder="{{ link_filter.label.1 }}" value="{{ link_filter.value.1 }}" class="small_input">
+                                </td>
+                            {% endif %}
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit" hidden>
+                </tr>
+            {% endif %}
+            {% for link_value in link_values %}
+                <tr>
+                    {% for link_item,link_align in link_value|zip:link_aligns %}
+                        {% if forloop.counter == 1 %}
+                            <td style="text-align:{{ link_align }}">
+                                <a href="/simulation/link-toggle/{{ link_item }}"><img alt="toggle" title="toggle" src="{% static 'toggle.png' %}"></a>
+                            </td>
+                        {% else %}
+                            <td style="text-align:{{ link_align }};white-space:pre-line;{% if link_item == 'OK' %}background-color:#adebad;{% elif link_item == 'FAILURE' %}background-color:#ff9999;{% endif %}">{{ link_item }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+    {% if buttons %}
+        {% for button in buttons %}
+            <table class="tab{{ width }}">
+                <tr>
+                    <td colspan="{{ headers.length }}">
+                        <form method="GET" action="{{ button.link }}">
+                            <input type="submit" value="{{ button.name }}" class="large_button">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
